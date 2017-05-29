@@ -50,9 +50,20 @@ namespace SchoolProjectClient
             {
                 mConnectForm.Hide();
             }
-            mConnection.RequestStyleList();
+            if (mConnection.isConnected())
+            {
+                mConnection.RequestStyleList();
+            } else
+            {
+                mConnectForm.setConnectionFailure(mConnection.mLastError);
+                mConnectForm.Show();
+            }
         }
 
+        public void setConnectionFailure(string pFail)
+        {
+            mConnectForm.setConnectionFailure(pFail);
+        }
         private Image DownloadImage(string pURL)
         {
             Console.WriteLine("Trying to get image : " + pURL);
@@ -125,8 +136,8 @@ namespace SchoolProjectClient
                 lTweetTextBox.AutoSize = false;
                 lTweetTextBox.MinimumSize = new Size(TweetFlowLayout.ClientSize.Width - 135, 152); // 100 + buttonsize
                 lTweetTextBox.MaximumSize = new Size(TweetFlowLayout.ClientSize.Width - 555, 0); // 100 + buttonsize
-              //  lTweetTextBox.Height += lTweetTextBox.GetPositionFromCharIndex(lTweetTextBox.Text.Length - 1).Y
-            //        + lTweetTextBox.Font.Height - lTweetTextBox.ClientSize.Height;
+                lTweetTextBox.Height += lTweetTextBox.GetPositionFromCharIndex(lTweetTextBox.Text.Length - 1).Y
+                    + lTweetTextBox.Font.Height - lTweetTextBox.ClientSize.Height;
                 lTweetPanel.Controls.Add(lTweetTextBox);
 
                 lTweetPanelImage.Top = lTweetTextBox.Top; //lTweetTextBox.Height / 2 - 50 + 10;
@@ -201,6 +212,13 @@ namespace SchoolProjectClient
 
         private void StyleCombobox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!mConnection.isConnected())
+            {
+                mConnectForm.setConnectionFailure(mConnection.mLastError);
+                mConnectForm.Show();
+            }
+            mConnectForm.NonBlockingWaitAwhile(3000);
+
               SwitchStyle();
         }
 

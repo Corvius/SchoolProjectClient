@@ -100,6 +100,8 @@ public class TTSConnectionClient
         List<Tweet> mTweets;
         Mainform mMainForm;
         string mDestination ="192.168.0.248";
+        bool mConnected = false;
+        public string mLastError;
 
         // Events
 
@@ -112,18 +114,20 @@ public class TTSConnectionClient
         private void StatusChange(string pStatus)
         {
             Console.WriteLine(pStatus);
+            mLastError = pStatus;
         }
-        private static void ShowErrorDialog(string pMessage)
+        private void ShowErrorDialog(string pMessage)
         {
             Console.WriteLine(pMessage);
+            mLastError = pMessage;
             //MessageBox.Show(pMessage, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public bool isConnected()
         {
-            bool part1 = mSocket.Poll(1000, SelectMode.SelectRead);
+            bool part1 = mSocket.Poll(3001, SelectMode.SelectRead);
             bool part2 = (mSocket.Available == 0);
-            if (part1 && part2)
+            if ((part1 && part2) || !mConnected)
                 return false;
             else
                 return true;
@@ -197,10 +201,11 @@ public class TTSConnectionClient
                     mSocket.EndConnect(AR);
                     StatusChange("Connect acknowledged. Preparing receive buffer and receive callback.");
                     EConnectDone.Set();
-
+                    mConnected = true;
                     mSocket.BeginReceive(lSo.mBuffer, 0, lSo.mBuffer.Length, SocketFlags.None, ReceiveCallback, lSo);
                 } else
                 {
+                    mConnected = false;
                     StatusChange("Connection could not be established to the server. Please enter the IP address of a working/accessible server and press Connect.");
                     EConnectDone.Set();
                 }
@@ -224,6 +229,7 @@ public class TTSConnectionClient
 
             if (lReceivedBytes > 0)
             {
+                mConnected = true;
                 lState.Append(Encoding.ASCII.GetString(lState.mBuffer, 0, lReceivedBytes));
                 Console.WriteLine(lState.mSb);
                 StatusChange("Data received from other endpoint (" + lReceivedBytes + " bytes)");
