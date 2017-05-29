@@ -91,6 +91,7 @@
             // 
             this.TweetFlowLayout.AutoScroll = true;
             this.TweetFlowLayout.AutoSize = true;
+            this.TweetFlowLayout.AutoScrollMinSize = new System.Drawing.Size(0, 700);
             this.tableLayoutPanel1.SetColumnSpan(this.TweetFlowLayout, 3);
             this.TweetFlowLayout.Location = new System.Drawing.Point(14, 64);
             this.TweetFlowLayout.MinimumSize = new System.Drawing.Size(615, 801);

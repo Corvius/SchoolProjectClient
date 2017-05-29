@@ -23,8 +23,6 @@ namespace SchoolProjectClient
         Image mTweetImage;
         Dictionary<string, string> mStyleDictionary = new Dictionary<string, string>();
 
-        bool mUpdatingStyles = false;
-
         public Mainform()
         {
             InitializeComponent();
@@ -88,31 +86,31 @@ namespace SchoolProjectClient
                 lTweetPanel.Name = pTweetID;
                 lTweetPanel.BorderStyle = BorderStyle.FixedSingle;
                 lTweetPanel.BackColor = Color.LightGray;
-                lTweetPanel.Size = new Size(TweetFlowLayout.ClientSize.Width - 28, 1200);
+                lTweetPanel.Size = new Size(TweetFlowLayout.ClientSize.Width - 8, 1200);
 
                 PictureBox lTweetPanelImage = new PictureBox();
-                lTweetPanelImage.Size = new Size(100, 100);
+                lTweetPanelImage.Size = new Size(102, 102);
                 lTweetPanelImage.Location = new Point(10, 10);
                 lTweetPanelImage.Image = mTweetImage;
                 lTweetPanelImage.SizeMode = PictureBoxSizeMode.StretchImage;
                 lTweetPanelImage.BorderStyle = BorderStyle.Fixed3D;
                 lTweetPanel.Controls.Add(lTweetPanelImage);
 
-                int buttonSize = (lTweetPanelImage.Size.Width / 2) - 4;
+                int buttonSize = 48;
                 Button lTweetUpVoteButton = new Button();
-                lTweetUpVoteButton.Name = lTweetPanel.Name;
                 lTweetUpVoteButton.Size = new Size(buttonSize, buttonSize);
                 lTweetUpVoteButton.BackgroundImage = Resource1.upvote;
                 lTweetUpVoteButton.BackgroundImageLayout = ImageLayout.Stretch;
                 lTweetUpVoteButton.Click += UpvoteTweet;
+                //lTweetUpVoteButton.Location = new Point(120, 10);
                 lTweetPanel.Controls.Add(lTweetUpVoteButton);
 
                 Button lTweetDownVoteButton = new Button();
-                lTweetDownVoteButton.Name = lTweetPanel.Name;
                 lTweetDownVoteButton.Size = new Size(buttonSize, buttonSize);
                 lTweetDownVoteButton.BackgroundImage = Resource1.downvote;
                 lTweetDownVoteButton.BackgroundImageLayout = ImageLayout.Stretch;
                 lTweetDownVoteButton.Click += DownvoteTweet;
+                //lTweetDownVoteButton.Location = new Point(280, 10);
                 lTweetPanel.Controls.Add(lTweetDownVoteButton);
 
                 TextBox lTweetTextBox = new TextBox();
@@ -122,11 +120,13 @@ namespace SchoolProjectClient
                 lTweetTextBox.WordWrap = true;
                 lTweetTextBox.Multiline = true;
                 lTweetTextBox.BackColor = Color.DimGray;
-                lTweetTextBox.Font = new Font("Arial", 12);
+                lTweetTextBox.Font = new Font("Arial", 16);
                 lTweetTextBox.Text = pTweetText;
-                lTweetTextBox.MinimumSize = new Size(TweetFlowLayout.ClientSize.Width - 135, 150); // 100 + buttonsize
-                lTweetTextBox.Height += lTweetTextBox.GetPositionFromCharIndex(lTweetTextBox.Text.Length - 1).Y
-                    + lTweetTextBox.Font.Height - lTweetTextBox.ClientSize.Height;
+                lTweetTextBox.AutoSize = false;
+                lTweetTextBox.MinimumSize = new Size(TweetFlowLayout.ClientSize.Width - 135, 152); // 100 + buttonsize
+                lTweetTextBox.MaximumSize = new Size(TweetFlowLayout.ClientSize.Width - 555, 0); // 100 + buttonsize
+              //  lTweetTextBox.Height += lTweetTextBox.GetPositionFromCharIndex(lTweetTextBox.Text.Length - 1).Y
+            //        + lTweetTextBox.Font.Height - lTweetTextBox.ClientSize.Height;
                 lTweetPanel.Controls.Add(lTweetTextBox);
 
                 lTweetPanelImage.Top = lTweetTextBox.Top; //lTweetTextBox.Height / 2 - 50 + 10;
@@ -156,6 +156,8 @@ namespace SchoolProjectClient
         {
             this.Invoke((MethodInvoker)delegate
             {
+                TweetFlowLayout.MaximumSize = new Size(0, 700);
+                TweetFlowLayout.AutoScrollPosition = new Point(0, 0);
                 string lImageURL = DEFAULT_IMAGEURL;
                 mStyleDictionary.TryGetValue(StyleCombobox.SelectedItem.ToString(), out lImageURL);
                 mTweetImage = DownloadImage(lImageURL);
@@ -171,7 +173,6 @@ namespace SchoolProjectClient
                 {
                     TweetRefreshButton.Enabled = false;
                     mStyleDictionary.Clear();
-                    mUpdatingStyles = true;
                     StyleCombobox.Items.Clear();
                     foreach (var lTweetStyle in pTweetStyles)
                     {
@@ -179,8 +180,7 @@ namespace SchoolProjectClient
                         mStyleDictionary.Add(lTweetStyle.mStyleName, lTweetStyle.mStyleImageURL);
                     }
                     StyleCombobox.SelectedIndex = 0;
-                    mUpdatingStyles = false;
-                });
+                   });
             StyleCombobox.SelectedIndexChanged += StyleCombobox_SelectedIndexChanged;
             SwitchStyle();
         }
